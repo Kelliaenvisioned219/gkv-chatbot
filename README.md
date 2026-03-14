@@ -1,14 +1,16 @@
 <p align="center">
-  <img src="docs/screenshot.png" alt="GKV Assistent — Screenshot" width="720">
+  <img src="docs/screenshot.png" alt="GKV Assistent — KI-Chatbot für die gesetzliche Krankenversicherung" width="720">
 </p>
 
 <h1 align="center">GKV Assistent</h1>
 
 <p align="center">
-  <strong>KI-gestützter Ratgeber zur gesetzlichen Krankenversicherung in Deutschland</strong>
+  <strong>KI-Chatbot & Voicebot für die gesetzliche Krankenversicherung in Deutschland</strong><br>
+  <em>AI-powered chatbot & voicebot for German statutory health insurance (GKV)</em>
 </p>
 
 <p align="center">
+  <a href="https://www.gkv.gazzar.de"><img src="https://img.shields.io/badge/Live_Demo-gkv.gazzar.de-000?style=flat-square" alt="Live Demo"></a>
   <img src="https://img.shields.io/badge/Sprache-Deutsch-000?style=flat-square" alt="Deutsch">
   <img src="https://img.shields.io/badge/PHP-8.2+-000?style=flat-square" alt="PHP 8.2+">
   <img src="https://img.shields.io/badge/Framework-CodeIgniter_4.7-000?style=flat-square" alt="CodeIgniter 4.7">
@@ -18,16 +20,26 @@
 
 ---
 
-## Überblick
+## Was ist der GKV Assistent?
 
-Der **GKV Assistent** ist ein KI-Chatbot, der Fragen zur gesetzlichen Krankenversicherung (GKV) in Deutschland beantwortet. Er nutzt eine kuratierte Wissensdatenbank auf Basis von **SGB V** und **SGB XI** und generiert Antworten ausschließlich anhand dieser Fakten — ohne Halluzinationen.
+Der **GKV Assistent** ist ein Open-Source **KI-Chatbot** und **Voicebot**, der Fragen zur gesetzlichen Krankenversicherung (GKV) in Deutschland beantwortet. Er nutzt eine kuratierte Wissensdatenbank auf Basis von **SGB V** und **SGB XI** und generiert faktenbasierte Antworten — ohne Halluzinationen.
 
-**Kernprinzipien:**
+> **English:** An open-source AI chatbot and voicebot for German statutory health insurance. Uses a curated knowledge base (SGB V / SGB XI) with LLM-powered responses, voice input, and real-time streaming. Ideal for Krankenkassen, InsurTech startups, and healthcare providers.
+
+### Einsatzgebiete
+
+- **Krankenkassen** — Automatisierter Kundenservice für GKV-Versicherte
+- **InsurTech** — Fertige Wissensbasis für Versicherungs-Chatbots
+- **Healthcare Providers** — Patienteninformation zu Leistungen und Rechten
+- **Forschung & Lehre** — Referenzimplementierung für KI im Gesundheitswesen
+
+### Kernprinzipien
 
 - ⬛ **Kassenunabhängig** — Vertritt keine bestimmte Krankenkasse
 - ⬛ **Faktenbasiert** — Antworten nur auf Basis der bereitgestellten Wissensbasis
 - ⬛ **Keine erfundenen URLs** — Generiert keine Links oder Kontaktdaten
-- ⬛ **Datenschutzkonform** — Keine Speicherung von Nutzerdaten
+- ⬛ **Spracheingabe & Sprachausgabe** — Browser-native Voice-Interaktion (Deutsch)
+- ⬛ **Datenschutzkonform** — Keine Speicherung personenbezogener Nutzerdaten
 
 ---
 
@@ -35,11 +47,11 @@ Der **GKV Assistent** ist ein KI-Chatbot, der Fragen zur gesetzlichen Krankenver
 
 | Funktion | Beschreibung |
 |---|---|
+| **KI-Chatbot** | LLM-gestützte Antworten auf Basis einer kuratierten GKV-Wissensdatenbank |
+| **Voicebot** | Browser-native Spracheingabe (Speech-to-Text) und Sprachausgabe (Text-to-Speech) auf Deutsch |
 | **Keyword-Retrieval** | Relevante Wissensdateien werden automatisch anhand der Nutzerfrage ausgewählt |
-| **LLM-Antworten** | AWS Bedrock (Amazon Nova Pro) generiert Antworten auf Basis der Wissensbasis |
 | **SSE-Streaming** | Antworten werden zeichenweise gestreamt (Typing-Effekt) |
-| **Spracheingabe** | Browser-native Speech-to-Text (Deutsch) |
-| **Sprachausgabe** | Text-to-Speech für Bot-Antworten |
+| **Rate Limiting** | 10 Anfragen pro Minute pro Nutzer (IP-basiert) |
 | **Wissenbank-Viewer** | Interaktive Übersicht aller Wissensdateien |
 | **Sicherheitsanalyse** | Governance & Safety Dokumentation |
 
@@ -53,7 +65,7 @@ gkv-chatbot/
 ├── app/
 │   ├── Controllers/
 │   │   ├── BaseController.php        # Basis-Controller
-│   │   ├── Chat.php                  # ◼ Chat-API (Systemprompt, SSE-Stream)
+│   │   ├── Chat.php                  # ◼ Chat-API (Systemprompt, SSE-Stream, Rate Limiting)
 │   │   └── Home.php                  # Startseite → chat View
 │   │
 │   ├── Libraries/
@@ -61,7 +73,7 @@ gkv-chatbot/
 │   │   └── WissenBank.php            # ◼ Keyword-basierte Kontextauswahl
 │   │
 │   ├── Views/
-│   │   └── chat.php                  # ◼ Frontend (HTML/CSS/JS)
+│   │   └── chat.php                  # ◼ Frontend (HTML/CSS/JS + Voice)
 │   │
 │   └── Config/
 │       ├── Routes.php                #   API-Routen
@@ -89,6 +101,7 @@ gkv-chatbot/
 │
 ├── .env.example                      #   Beispiel-Konfiguration
 ├── composer.json                     #   PHP-Abhängigkeiten
+├── LICENSE                           #   MIT-Lizenz
 └── README.md                         #   Diese Datei
 ```
 
@@ -105,6 +118,7 @@ flowchart TB
     end
 
     subgraph SERVER["CodeIgniter 4"]
+        RL["Rate Limiter<br><em>10 req/min/IP</em>"]
         CHAT["Chat Controller<br><em>POST /api/chat</em>"]
         WB["WissenBank<br><em>Keyword-Matching</em>"]
         BC["BedrockClient<br><em>cURL + SigV4</em>"]
@@ -115,11 +129,12 @@ flowchart TB
     end
 
     subgraph AWS["AWS Bedrock"]
-        LLM["Amazon Nova Pro<br><em>eu-central-1</em>"]
+        LLM["Amazon Nova Lite<br><em>eu-central-1</em>"]
     end
 
-    UI -- "Frage (JSON)" --> CHAT
+    UI -- "Frage (JSON)" --> RL
     STT -.-> UI
+    RL --> CHAT
     CHAT -- "selectContext()" --> WB
     WB -- "liest" --> MD
     WB -- "Kontext" --> CHAT
@@ -142,7 +157,7 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-    A["Nutzerfrage"] --> B["Keyword-<br>Analyse"]
+    A["Nutzerfrage<br><em>Text oder Sprache</em>"] --> B["Keyword-<br>Analyse"]
     B --> C["Kontext-<br>Auswahl"]
     C --> D["Prompt-<br>Erstellung"]
     D --> E["LLM-<br>Anfrage"]
@@ -158,15 +173,18 @@ flowchart LR
 
 **Ablauf im Detail:**
 
-1. **Keyword-Analyse** — Die Nutzerfrage wird in Kleinbuchstaben analysiert und mit dem Keyword-Index abgeglichen
-2. **Kontext-Auswahl** — Die relevantesten Wissensdateien werden nach Score sortiert ausgewählt (max. 30.000 Zeichen)
-3. **Prompt-Erstellung** — Systemprompt + Wissensbasis-Kontext + Chatverlauf werden zusammengesetzt
-4. **LLM-Anfrage** — AWS Bedrock wird via SigV4-signiertem HTTPS-Request angefragt
-5. **SSE-Streaming** — Die Antwort wird in 8-Byte-Blöcken per Server-Sent Events gestreamt
+1. **Sprach- oder Texteingabe** — Nutzerfrage per Tastatur oder Spracheingabe (Web Speech API, Deutsch)
+2. **Rate Limiting** — IP-basierte Begrenzung auf 10 Anfragen pro Minute
+3. **Keyword-Analyse** — Die Nutzerfrage wird analysiert und mit dem Keyword-Index abgeglichen
+4. **Kontext-Auswahl** — Die relevantesten Wissensdateien werden nach Score sortiert ausgewählt (max. 30.000 Zeichen)
+5. **Prompt-Erstellung** — Systemprompt + Wissensbasis-Kontext + Chatverlauf werden zusammengesetzt
+6. **LLM-Anfrage** — AWS Bedrock wird via SigV4-signiertem HTTPS-Request angefragt
+7. **SSE-Streaming** — Die Antwort wird in 8-Byte-Blöcken per Server-Sent Events gestreamt
+8. **Sprachausgabe** — Optionale Text-to-Speech Ausgabe der Bot-Antwort
 
 ---
 
-## Wissensbasis
+## Wissensdatenbank
 
 Die Wissensdatenbank besteht aus **10 kuratierten Markdown-Dateien** mit insgesamt ~30 KB Inhalt. Alle Informationen basieren auf den gesetzlichen Grundlagen (SGB V, SGB XI) und sind kassenunabhängig.
 
@@ -226,7 +244,7 @@ Alle Einstellungen werden über die `.env`-Datei gesteuert:
 AWS_ACCESS_KEY_ID     = YOUR_KEY
 AWS_SECRET_ACCESS_KEY = YOUR_SECRET
 AWS_REGION            = eu-central-1
-BEDROCK_MODEL_ID      = eu.amazon.nova-pro-v1:0
+BEDROCK_MODEL_ID      = eu.amazon.nova-lite-v1:0
 ```
 
 ---
@@ -246,11 +264,19 @@ BEDROCK_MODEL_ID      = eu.amazon.nova-pro-v1:0
 | Komponente | Technologie |
 |---|---|
 | Backend | PHP 8.2 · CodeIgniter 4.7 |
-| LLM | AWS Bedrock · Amazon Nova Pro |
+| LLM | AWS Bedrock · Amazon Nova Lite |
 | Authentifizierung | AWS SigV4 (eigene Implementierung) |
 | Frontend | Vanilla HTML · CSS · JavaScript |
+| Spracheingabe | Web Speech API · Speech-to-Text (Deutsch) |
+| Sprachausgabe | Web Speech API · Text-to-Speech (Deutsch) |
 | Schriftart | Inter (Google Fonts) |
-| Spracherkennung | Web Speech API (Browser-nativ) |
+| Icons | Phosphor Icons |
+
+---
+
+## Schlüsselwörter / Keywords
+
+`KI-Chatbot` · `Voicebot` · `Künstliche Intelligenz` · `Gesetzliche Krankenversicherung` · `GKV` · `SGB V` · `SGB XI` · `Krankenkasse` · `Health Insurance Germany` · `AI Chatbot` · `Healthcare Chatbot` · `Voice Assistant` · `Conversational AI` · `InsurTech` · `Kundenservice` · `AWS Bedrock` · `LLM` · `Speech-to-Text` · `Text-to-Speech` · `CodeIgniter` · `PHP` · `Open Source`
 
 ---
 
