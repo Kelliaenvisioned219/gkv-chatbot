@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governance & Sicherheit — GKV Assistent Chatbot</title>
+<meta name="description" content="Sicherheitsrelevante Risiken, Auswirkungen und Gegenmaßnahmen für den KI-Chatbot des GKV Assistenten.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #ffffff;
+    --surface: #f7f8fa;
+    --surface-hover: #eef0f4;
+    --border: rgba(0,0,0,0.07);
+    --text: #1a1a2e;
+    --text-muted: #555770;
+    --text-dim: #8b8fa3;
+    --accent: #5046e5;
+    --accent-glow: rgba(80,70,229,0.08);
+    --critical: #dc2626;
+    --critical-bg: rgba(220,38,38,0.07);
+    --high: #d97706;
+    --high-bg: rgba(217,119,6,0.07);
+    --medium: #ca8a04;
+    --medium-bg: rgba(202,138,4,0.07);
+    --low: #16a34a;
+    --low-bg: rgba(22,163,74,0.07);
+    --info: #0284c7;
+    --info-bg: rgba(2,132,199,0.07);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    padding: 80px 48px 64px;
+    max-width: 1280px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -80px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  .hero-subtitle {
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 680px;
+  }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    max-width: 1280px;
+    margin: 0 auto 56px;
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .stat-number {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-number.critical { color: var(--critical); }
+  .stat-number.high { color: var(--high); }
+  .stat-number.medium { color: var(--medium); }
+  .stat-number.accent { color: var(--accent); }
+
+  .stat-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  /* ─── CATEGORIES ─── */
+  .content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+  }
+
+  .category {
+    margin-bottom: 56px;
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .category-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .category-icon.ai { background: var(--critical-bg); }
+  .category-icon.privacy { background: var(--high-bg); }
+  .category-icon.web { background: var(--medium-bg); }
+  .category-icon.ops { background: var(--info-bg); }
+  .category-icon.ux { background: var(--low-bg); }
+
+  .category-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .category-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-left: auto;
+  }
+
+  /* ─── RISK ROWS ─── */
+  .risk-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .risk-row {
+    display: grid;
+    grid-template-columns: 260px 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .risk-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .risk-cell {
+    background: var(--surface);
+    padding: 24px 28px;
+    transition: background 0.2s ease;
+  }
+
+  .risk-row:hover .risk-cell {
+    background: var(--surface-hover);
+  }
+
+  .risk-cell:first-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .risk-name {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .severity-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 6px;
+    width: fit-content;
+  }
+
+  .severity-tag.critical { color: var(--critical); background: var(--critical-bg); }
+  .severity-tag.high { color: var(--high); background: var(--high-bg); }
+  .severity-tag.medium { color: var(--medium); background: var(--medium-bg); }
+  .severity-tag.low { color: var(--low); background: var(--low-bg); }
+  .severity-tag.info { color: var(--info); background: var(--info-bg); }
+
+  .severity-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .cell-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .cell-text {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--text-muted);
+  }
+
+  .mitigation-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mitigation-list li {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text-muted);
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .mitigation-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ─── TABLE HEADER (labels row) ─── */
+  .table-header {
+    display: grid;
+    grid-template-columns: 260px 1fr 1fr;
+    gap: 1px;
+    margin-bottom: 12px;
+    padding: 0 28px;
+  }
+
+  .table-header span {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 48px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-text {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .footer-text strong {
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .footer-branding {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1024px) {
+    .hero { padding: 48px 24px 40px; }
+    .hero h1 { font-size: 32px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); padding: 0 24px; }
+    .content { padding: 0 24px 60px; }
+    .risk-row { grid-template-columns: 1fr; }
+    .table-header { display: none; }
+    .footer { padding: 24px; flex-direction: column; gap: 12px; }
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 26px; }
+    .stats-bar { grid-template-columns: 1fr; }
+    .risk-cell { padding: 18px 20px; }
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    .hero::before { display: none; }
+    .stat-card, .risk-cell { background: #fff; border: 1px solid #ddd; }
+    .risk-row { box-shadow: none !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<div class="hero">
+  <div class="hero-badge">Governance & Sicherheit</div>
+  <h1>KI-Chatbot<br>Sicherheitsanalyse</h1>
+  <p class="hero-subtitle">Sicherheitsrelevante Risiken des GKV Assistent Chatbot-Projekts, deren mögliche Auswirkungen und die empfohlenen Gegenmaßnahmen — gruppiert nach Kategorie und Schweregrad.</p>
+</div>
+
+<!-- ─── STATS ─── -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-number critical">20</div>
+    <div class="stat-label">Identifizierte Risiken</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number high">6</div>
+    <div class="stat-label">KI-spezifische Risiken</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number medium">5</div>
+    <div class="stat-label">Datenschutz & Recht</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number accent">9</div>
+    <div class="stat-label">Infrastruktur & Web</div>
+  </div>
+</div>
+
+<!-- ─── CONTENT ─── -->
+<div class="content">
+
+  <!-- ━━━ CATEGORY 1: KI-SPEZIFISCH ━━━ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-icon ai"><i class="ph ph-sparkle"></i></div>
+      <div class="category-title">KI-spezifische Risiken</div>
+      <span class="category-count">6 Risiken</span>
+    </div>
+
+    <div class="table-header">
+      <span>Risiko / Schweregrad</span>
+      <span>Auswirkung</span>
+      <span>Maßnahme</span>
+    </div>
+
+    <div class="risk-grid">
+      <!-- 1 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Prompt Injection</span>
+          <span class="severity-tag critical"><span class="severity-dot"></span>Kritisch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Angreifer können den System-Prompt überschreiben und den Chatbot dazu bringen, falsche medizinische oder vertragliche Informationen auszugeben, interne Anweisungen offenzulegen oder als Werkzeug für Social Engineering zu dienen.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Strikte Trennung von System-Prompt und Benutzereingaben</li>
+            <li>Eingabevalidierung und Sanitization aller User-Inputs</li>
+            <li>Einsatz von LLM-Guardrails zur Erkennung und Blockierung</li>
+            <li>Regelmäßige Red-Team-Tests</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Jailbreaking</span>
+          <span class="severity-tag critical"><span class="severity-dot"></span>Kritisch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Der Chatbot kann dazu gebracht werden, seine Sicherheitsrichtlinien zu umgehen und unzulässige Inhalte zu generieren — z. B. beleidigende Sprache, Fehlinformationen oder Inhalte außerhalb des Versicherungs-Kontexts.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Robuste System-Prompts mit klaren Verhaltensregeln</li>
+            <li>Ausgabefilter auf toxische und unangemessene Inhalte</li>
+            <li>Whitelisting erlaubter Themengebiete</li>
+            <li>Monitoring verdächtiger Konversationsmuster</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Halluzinationen / Fehlinformationen</span>
+          <span class="severity-tag critical"><span class="severity-dot"></span>Kritisch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Der Chatbot erfindet falsche Leistungsansprüche, Beitragssätze oder Kontaktdaten. Versicherte könnten auf Basis falscher Informationen handeln, was zu finanziellen Schäden oder Vertrauensverlust führt.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>RAG ausschließlich auf Basis geprüfter wissenBank-Dokumente</li>
+            <li>Temperatur-Parameter niedrig halten</li>
+            <li>Antworten mit Quellenverweisen versehen</li>
+            <li>Disclaimer: keine rechtsverbindliche Auskunft</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Bias / Diskriminierung</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Das Sprachmodell könnte bestimmte Personengruppen benachteiligen oder diskriminierende Antworten geben, z. B. aufgrund von Alter, Geschlecht oder Herkunft.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Regelmäßige Bias-Audits der Chatbot-Antworten</li>
+            <li>Diverse Testszenarien erstellen</li>
+            <li>Feedback-Mechanismus für Nutzer bereitstellen</li>
+            <li>Inklusive Sprache im System-Prompt verankern</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Content-Moderation</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Nutzer könnten den Chatbot für die Generierung von schädlichen, illegalen oder beleidigenden Inhalten missbrauchen.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Eingabe- und Ausgabefilter (LLM-API Guardrails)</li>
+            <li>Missbrauchsmeldungen ermöglichen</li>
+            <li>Automatische Erkennung von Hate Speech</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Modellvergiftung / Data Poisoning</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Manipulierte Inhalte in der Wissensdatenbank können den Chatbot dazu bringen, dauerhaft falsche Informationen zu liefern.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Schreibzugriff auf wissenBank strikt begrenzen</li>
+            <li>Änderungen über Git nachverfolgen</li>
+            <li>Review-Prozess für Inhaltsaktualisierungen</li>
+            <li>Regelmäßige Qualitätsprüfung der Wissensbasis</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ CATEGORY 2: DATENSCHUTZ & RECHT ━━━ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-icon privacy"><i class="ph ph-shield-check"></i></div>
+      <div class="category-title">Datenschutz & Recht</div>
+      <span class="category-count">5 Risiken</span>
+    </div>
+
+    <div class="table-header">
+      <span>Risiko / Schweregrad</span>
+      <span>Auswirkung</span>
+      <span>Maßnahme</span>
+    </div>
+
+    <div class="risk-grid">
+      <!-- 1 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Datenschutz / DSGVO-Verstoß</span>
+          <span class="severity-tag critical"><span class="severity-dot"></span>Kritisch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Personenbezogene Daten (Name, Versicherungsnummer, Gesundheitsdaten) könnten unrechtmäßig verarbeitet, gespeichert oder an Dritte übermittelt werden. Bußgelder bis zu 20 Mio. € oder 4 % des Jahresumsatzes.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Keine Speicherung personenbezogener Daten ohne Einwilligung</li>
+            <li>Datenschutzerklärung prominent verlinken</li>
+            <li>Verarbeitungsverzeichnis (Art. 30 DSGVO) führen</li>
+            <li>AVV mit LLM-API-Anbieter abschließen</li>
+            <li>Datenminimierung: Nur notwendige Daten erheben</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Gesundheitsdaten (Art. 9 DSGVO)</span>
+          <span class="severity-tag critical"><span class="severity-dot"></span>Kritisch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Gesundheitsbezogene Angaben im Chat zählen als besondere Kategorien personenbezogener Daten und unterliegen verschärftem Schutz. Unbefugter Zugriff kann schwerwiegende Konsequenzen haben.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Explizite Einwilligung vor Verarbeitung einholen</li>
+            <li>Verschlüsselung aller Daten (TLS 1.2+, at Rest)</li>
+            <li>Zugriffsbeschränkung auf autorisiertes Personal</li>
+            <li>Pseudonymisierung wo möglich</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Transparenzpflicht (EU AI Act)</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Ab dem EU AI Act müssen Nutzer darüber informiert werden, dass sie mit einem KI-System interagieren. Nichteinhaltung kann zu Bußgeldern führen.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Klare Kennzeichnung des Chatbots als KI-System</li>
+            <li>Hinweis: „Sie sprechen mit einem KI-gestützten Assistenten."</li>
+            <li>Dokumentation gemäß EU AI Act-Anforderungen</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Urheberrecht / Haftung</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Der Chatbot gibt urheberrechtlich geschützte Texte Dritter wieder oder erteilt rechtsverbindliche Auskünfte, die haftungsrechtlich problematisch sind.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Antworten ausschließlich aus eigener wissenBank</li>
+            <li>Haftungsausschluss prominent anzeigen</li>
+            <li>Regelmäßige juristische Prüfung der Ausgaben</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Logging & Auditierung</span>
+          <span class="severity-tag medium"><span class="severity-dot"></span>Mittel</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Ohne ordentliches Logging sind Sicherheitsvorfälle nicht nachvollziehbar. Compliance-Anforderungen (BSI, BaFin) können nicht erfüllt werden.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Strukturiertes Logging aller API-Aufrufe und Fehler</li>
+            <li>Logs personendatenkonform gestalten</li>
+            <li>Log-Retention-Policy definieren</li>
+            <li>Zentrale Log-Aggregation einsetzen</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ CATEGORY 3: WEB-SICHERHEIT ━━━ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-icon web"><i class="ph ph-globe"></i></div>
+      <div class="category-title">Web-Sicherheit</div>
+      <span class="category-count">4 Risiken</span>
+    </div>
+
+    <div class="table-header">
+      <span>Risiko / Schweregrad</span>
+      <span>Auswirkung</span>
+      <span>Maßnahme</span>
+    </div>
+
+    <div class="risk-grid">
+      <!-- 1 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Cross-Site Scripting (XSS)</span>
+          <span class="severity-tag critical"><span class="severity-dot"></span>Kritisch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Schadcode in Benutzereingaben wird im Chat-Frontend ausgeführt und kann Sitzungsdaten stehlen oder Nutzer umleiten.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Alle Ein-/Ausgaben HTML-escapen</li>
+            <li>Content Security Policy (CSP)-Header setzen</li>
+            <li>Keine Inline-Skripte erlauben</li>
+            <li>Sanitization-Bibliotheken verwenden</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Cross-Site Request Forgery (CSRF)</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Angreifer können authentifizierte Aktionen im Namen des Nutzers ausführen, z. B. Chat-Verlauf manipulieren oder Account-Einstellungen ändern.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>CodeIgniter CSRF-Token-Schutz aktivieren</li>
+            <li>SameSite-Cookie-Attribut setzen</li>
+            <li>Origin-Header validieren</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Server-Side Request Forgery (SSRF)</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Über manipulierte Eingaben könnte der Server dazu gebracht werden, interne Ressourcen oder Netzwerke anzufragen.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Ausgehende Verbindungen auf erlaubte Endpunkte beschränken</li>
+            <li>Keine nutzergesteuerten URLs serverseitig abrufen</li>
+            <li>Netzwerksegmentierung anwenden</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Session-Management</span>
+          <span class="severity-tag medium"><span class="severity-dot"></span>Mittel</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Unsichere Session-Verwaltung ermöglicht Session-Hijacking und unbefugten Zugriff auf vertrauliche Konversationen.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Sichere Session-IDs generieren</li>
+            <li>Session-Timeout konfigurieren</li>
+            <li>HttpOnly- und Secure-Flags für Cookies</li>
+            <li>Session-Fixation-Schutz in CodeIgniter aktivieren</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ CATEGORY 4: INFRASTRUKTUR & BETRIEB ━━━ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-icon ops"><i class="ph ph-gear-six"></i></div>
+      <div class="category-title">Infrastruktur & Betrieb</div>
+      <span class="category-count">4 Risiken</span>
+    </div>
+
+    <div class="table-header">
+      <span>Risiko / Schweregrad</span>
+      <span>Auswirkung</span>
+      <span>Maßnahme</span>
+    </div>
+
+    <div class="risk-grid">
+      <!-- 1 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">API-Schlüssel-Leck</span>
+          <span class="severity-tag critical"><span class="severity-dot"></span>Kritisch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Offengelegte LLM-API-Keys ermöglichen unbefugten Zugriff auf das Sprachmodell, was hohe Kosten und Missbrauch verursachen kann.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>API-Schlüssel niemals im Frontend/öffentlichen Repos</li>
+            <li>Serverseitige Umgebungsvariablen (.env)</li>
+            <li>Schlüsselrotation regelmäßig durchführen</li>
+            <li>IAM-Rollen mit Least Privilege</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Rate Limiting / DoS-Schutz</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Ohne Begrenzung können Angreifer den Chatbot mit Massenanfragen überfluten, was zu hohen API-Kosten und Nichtverfügbarkeit führt.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Rate Limiting pro IP und pro Session</li>
+            <li>CAPTCHA bei verdächtiger Aktivität</li>
+            <li>WAF oder Cloudflare vor die API</li>
+            <li>Kostenalarme beim LLM-API-Anbieter einrichten</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Verfügbarkeit / Ausfallsicherheit</span>
+          <span class="severity-tag medium"><span class="severity-dot"></span>Mittel</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Ausfälle des LLM-Dienstes machen den Chatbot komplett unbenutzbar.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Fallback-Antworten für den Offline-Fall</li>
+            <li>Retry-Logik mit exponentiellem Backoff</li>
+            <li>Health-Check-Endpunkt einrichten</li>
+            <li>Statusseite für Nutzer anbieten</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Abhängigkeit von Drittanbietern</span>
+          <span class="severity-tag medium"><span class="severity-dot"></span>Mittel</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Starke Abhängigkeit vom LLM-API-Anbieter bedeutet Risiko bei Preisänderungen, API-Änderungen oder Diensteinstellungen.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Abstraktionsschicht zwischen Chatbot und LLM-API</li>
+            <li>Alternative Anbieter evaluieren</li>
+            <li>SLA-Vereinbarungen prüfen</li>
+            <li>Budget-Monitoring und Kostenobergrenzen</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ CATEGORY 5: UX & VERANTWORTUNG ━━━ -->
+  <div class="category">
+    <div class="category-header">
+      <div class="category-icon ux"><i class="ph ph-user-focus"></i></div>
+      <div class="category-title">UX & Verantwortung</div>
+      <span class="category-count">1 Risiko</span>
+    </div>
+
+    <div class="table-header">
+      <span>Risiko / Schweregrad</span>
+      <span>Auswirkung</span>
+      <span>Maßnahme</span>
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-row">
+        <div class="risk-cell">
+          <span class="risk-name">Fehlende Eskalation an Menschen</span>
+          <span class="severity-tag high"><span class="severity-dot"></span>Hoch</span>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Auswirkung</div>
+          <p class="cell-text">Nutzer mit dringenden Anliegen (z. B. Leistungsablehnung, Notfall) erhalten nur automatisierte Antworten, was zu Frustration und Schaden führen kann.</p>
+        </div>
+        <div class="risk-cell">
+          <div class="cell-label">Maßnahme</div>
+          <ul class="mitigation-list">
+            <li>Klare Eskalationspfade zu menschlichen Agenten</li>
+            <li>Bei Dringlichkeit auf Kontaktmöglichkeiten verweisen</li>
+            <li>Chatbot-Grenzen transparent kommunizieren</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── FOOTER ─── -->
+<div class="footer">
+  <span class="footer-text"><strong>Stand: März 2026</strong> · Dieses Dokument sollte bei jeder größeren Änderung am Chatbot-System aktualisiert werden.</span>
+  <span class="footer-branding">GKV Assistent · KI-Governance</span>
+</div>
+
+</body>
+</html>
